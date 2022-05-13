@@ -53,7 +53,7 @@ export default {
     const ipInfo = ref(null);
     // mounted lifecycle hook, creates the map
     onMounted(() => {
-      mymap = leaflet.map("mapid").setView([42.5145, -83.0147], 9);
+      mymap = leaflet.map("mapid").setView([-34.92, 138.6], 12);
       leaflet
         .tileLayer(
           "https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoiYWxleGcxOTk1IiwiYSI6ImNsMzNvZjJlYzAzZ3Iza3FtaGFmZTh0cWYifQ.sS6YCt3q-EJWaegnYTopFg",
