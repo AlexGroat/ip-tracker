@@ -18,6 +18,7 @@
         <h1 class="text-white text-center text-3xl pb-4">IP Address Tracker</h1>
         <div class="flex">
           <input
+            v-model="queryIp"
             class="
               flex-1
               py-3
@@ -29,6 +30,7 @@
             placeholder="Search for any IP address or leave empty to get your IP info"
           />
           <i
+            @click="getIpInfo"
             class="
               fa-solid fa-chevron-right
               cursor-pointer
@@ -43,7 +45,7 @@
         </div>
       </div>
       <!-- IP Info -->
-      <IPInfo />
+      <IPInfo v-if="ipInfo" v-bind:ipInfo="ipInfo" />
     </div>
 
     <!-- Map -->
@@ -55,7 +57,8 @@
 // @ is an alias to /src
 import IPInfo from "../components/IPInfo.vue";
 import leaflet from "leaflet";
-import { onMounted } from "vue";
+import { onMounted, ref } from "vue";
+import axios from "axios";
 
 export default {
   name: "HomeView",
@@ -63,8 +66,11 @@ export default {
   setup() {
     let map;
 
+    const queryIp = ref("");
+    const ipInfo = ref(null);
+
     onMounted(() => {
-      map = leaflet.map("map").setView([51.505, -0.09], 13);
+      map = leaflet.map("map").setView([-34.92, 138.6], 12);
 
       leaflet
         .tileLayer(
@@ -82,6 +88,29 @@ export default {
         )
         .addTo(map);
     });
+
+    const getIpInfo = async () => {
+      try {
+        const data = await axios.get(
+          `https://geo.ipify.org/api/v2/country?apiKey=at_Tm53UuTujjjmaHJxbyF6jE3F8Bnk0&ipAddress=${queryIp.value}`
+        );
+        const res = data.data;
+        console.log(res)
+        ipInfo.value = {
+          address: res.ip,
+          state: res.location.region,
+          timezone: res.location.timezone,
+          isp: res.isp,
+          lat: res.location.lat,
+          lng: res.location.lng,
+        };
+        leaflet.marker([ipInfo.value.lat, ipInfo.value.lng]).addTo(map);
+        map.setView([ipInfo.value.lat, ipInfo.value.lng], 13);
+      } catch (err) {
+        alert(err.message);
+      }
+    };
+    return { queryIp, ipInfo, getIpInfo };
   },
 };
 </script>
